@@ -1,13 +1,38 @@
-# Distributed Dataset Statistics using MPI
+<div align="center">
 
-**Course:** Parallel and Grid Computing (PGC) – Lab Evaluation
-**Theme:** 6 – Distributed Dataset Statistics
-**Parallel Model:** MPI (Message Passing Interface)
-**Team:** B1 Team 6
-**Dataset size used:** N = 1000 (numbers 1 to 1000)
+# 🌐 Distributed Dataset Statistics using MPI
+
+### Sum · Average · Maximum · Minimum — computed in parallel across a Master + 3 Worker cluster
+
+![C](https://img.shields.io/badge/Language-C-00599C?style=for-the-badge&logo=c&logoColor=white)
+![MPI](https://img.shields.io/badge/Model-MPI-blueviolet?style=for-the-badge)
+![Open MPI](https://img.shields.io/badge/Library-Open%20MPI-orange?style=for-the-badge)
+![Ubuntu](https://img.shields.io/badge/OS-Ubuntu%20VMs-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+![Processes](https://img.shields.io/badge/Processes-4-success?style=for-the-badge)
+![Status](https://img.shields.io/badge/Result-Verified%20✔-brightgreen?style=for-the-badge)
+
+**Parallel and Grid Computing (PGC) — Lab Evaluation · Theme 6 · Team B1-6**
+
+</div>
+
+---
+
+## ✨ At a Glance
+
+| | |
+|---|---|
+| 🎓 **Course** | Parallel and Grid Computing (PGC) – Lab Evaluation |
+| 🧩 **Theme** | 6 – Distributed Dataset Statistics |
+| ⚙️ **Parallel model** | MPI (Message Passing Interface) |
+| 📦 **Dataset** | N = 1000 integers (1 … 1000) |
+| 🖥️ **Cluster** | 1 Master + 3 Worker VMs → **4 MPI processes** |
+| 🎯 **Result** | Sum = **500500**, Average = **500.50**, Max = **1000**, Min = **1** |
+| ⏱️ **MPI time** | **0.3 – 0.9 ms** |
+
+### 👥 Team
 
 | Name | Roll No. |
-|------|----------|
+|---|:---:|
 | Divya Kumari | 222 |
 | Chaitanya M | 228 |
 | Shridevi | 230 |
@@ -15,28 +40,58 @@
 
 ---
 
-## 1. Objective
+## 📑 Table of Contents
 
-To calculate the **sum, average, maximum and minimum** of a dataset of **1000 numbers** using **4 MPI processes** on a cluster of one Master and three Worker VMs, and to compare the parallel result and workload with the sequential version.
+1. [Objective](#-objective)
+2. [How It Works](#-how-it-works)
+3. [Problem Definition](#-problem-definition)
+4. [Algorithms](#-algorithms)
+5. [Cluster Setup](#-cluster-setup)
+6. [Repository Structure](#-repository-structure)
+7. [Build & Run](#-build--run)
+8. [Output](#-output)
+9. [Results & Graphs](#-results--graphs)
+10. [Analysis](#-analysis)
+11. [Troubleshooting](#-troubleshooting)
+12. [Checkpoint Mapping](#-checkpoint-mapping)
+13. [Conclusion](#-conclusion)
 
-## 2. Introduction (in simple words)
+---
 
-When a dataset is large, one computer takes a long time to process it. Instead, we can **divide the data into equal parts** and give each part to a different process. Every process works on its own part at the same time. At the end, the partial answers are **combined** into the final answer.
+## 🎯 Objective
 
-**MPI** is a library that lets many processes (on one or many computers) talk to each other by sending messages. Each process has a number called its **rank** (0, 1, 2, 3). Rank 0 is the **master**: it holds the data, sends parts to the others and collects the results. Every process has its **own memory**, so data must be sent explicitly.
+Calculate the **sum, average, maximum and minimum** of a dataset of **1000 numbers** using **4 MPI processes** on one Master and three Worker VMs, and compare the parallel result and workload with the sequential version.
 
-## 3. Problem Definition
+---
 
-- **Input:** a dataset of N = 1000 integers (1, 2, 3, ..., 1000).
-- **Output:** Sum, Average (= Sum / N), Maximum, Minimum.
-- **Goal:** compute these using 4 MPI processes and check that the answer equals the sequential answer.
+## 💡 How It Works
 
-Expected answer (by formula): Sum = 1000 x 1001 / 2 = **500500**, Average = **500.50**, Max = **1000**, Min = **1**.
+When a dataset is large, one computer takes a long time to process it. The idea:
 
-## 4. Algorithms
+1. **Divide** the data into equal parts.
+2. Give each part to a **different process**.
+3. All processes work **at the same time**.
+4. **Combine** the partial answers into the final answer.
 
-### 4.1 Sequential Algorithm
-```
+**MPI** lets processes (on one or many computers) communicate by sending messages. Each process has a number called its **rank** (0, 1, 2, 3). **Rank 0 is the master**: it holds the data, sends parts to the others and collects the results. Every process has its **own memory**, so data must be sent explicitly.
+
+---
+
+## 📋 Problem Definition
+
+- **Input:** N = 1000 integers `1, 2, 3, …, 1000`
+- **Output:** Sum, Average (= Sum / N), Maximum, Minimum
+- **Goal:** compute them with 4 MPI processes and confirm the answer equals the sequential answer
+
+Expected values from the formula: Sum = 1000 × 1001 / 2 = **500500**, Average = **500.50**, Max = **1000**, Min = **1**.
+
+---
+
+## 🧠 Algorithms
+
+### Sequential
+
+```text
 sum = 0; max = min = first element
 for each number x in the dataset:
     sum = sum + x
@@ -44,207 +99,221 @@ for each number x in the dataset:
     if x < min: min = x
 average = sum / N
 ```
-Time complexity: **O(N)**, all work done by one process.
 
-### 4.2 Parallel Design (MPI)
-1. **Initialise** MPI and get the rank and number of processes.
-2. **Rank 0** creates the dataset (1 to 1000).
-3. **Distribute:** `MPI_Scatter` gives each process an equal block of **1000 / 4 = 250** numbers.
-4. **Local computation:** every process finds the sum, maximum and minimum of its own 250 numbers.
-5. **Combine:** `MPI_Reduce` with `MPI_SUM`, `MPI_MAX` and `MPI_MIN` collects the partial results at rank 0.
-6. **Final result:** rank 0 computes average = total sum / 1000, prints the statistics and the execution time.
-7. **Finalise** MPI.
+Time complexity: **O(N)** — one process does all the work.
 
-```
-              Rank 0 holds the 1000 numbers
-                      |  MPI_Scatter (250 numbers each)
-     +----------+-----+-----+----------+
-  Rank 0     Rank 1      Rank 2     Rank 3
-  1-250     251-500     501-750    751-1000
- local calc  local calc  local calc local calc
-     +----------+-----+-----+----------+
-                      |  MPI_Reduce (SUM, MAX, MIN)
-                   Rank 0 -> Sum, Average, Max, Min
+### Parallel (MPI)
+
+```mermaid
+flowchart TD
+    A["Rank 0 creates dataset 1..1000"] --> B["MPI_Scatter: 250 numbers to each rank"]
+    B --> C0["Rank 0: local sum / max / min"]
+    B --> C1["Rank 1: local sum / max / min"]
+    B --> C2["Rank 2: local sum / max / min"]
+    B --> C3["Rank 3: local sum / max / min"]
+    C0 --> D["MPI_Reduce: SUM, MAX, MIN to Rank 0"]
+    C1 --> D
+    C2 --> D
+    C3 --> D
+    D --> E["Rank 0: average = sum / 1000, print results and time"]
 ```
 
-### 4.3 MPI Functions Used
+1. Initialise MPI, get rank and number of processes
+2. Rank 0 creates the dataset
+3. **`MPI_Scatter`** — each process gets 1000 / 4 = **250** numbers
+4. Each process finds the sum, max and min of its own block
+5. **`MPI_Reduce`** (`MPI_SUM`, `MPI_MAX`, `MPI_MIN`) collects partial results at rank 0
+6. Rank 0 computes the average, prints the statistics and execution time
+7. Finalise MPI
+
+### MPI functions used
 
 | Function | Purpose |
-|----------|---------|
+|---|---|
 | `MPI_Init` / `MPI_Finalize` | Start and end the MPI environment |
-| `MPI_Comm_rank` / `MPI_Comm_size` | Get the rank and the number of processes |
+| `MPI_Comm_rank` / `MPI_Comm_size` | Get the rank and number of processes |
 | `MPI_Scatter` | Divide the dataset equally among all processes |
 | `MPI_Reduce` | Combine partial sum, max and min at rank 0 |
 | `MPI_Wtime` | Measure execution time |
 
-### 4.4 Work Done by Each Process
+### Work done by each process
 
-| Rank | Node | Numbers Received | Count | Local Sum |
-|------|------|------------------|-------|-----------|
-| 0 | master | 1 – 250 | 250 | 31375 |
-| 1 | worker1 | 251 – 500 | 250 | 93875 |
-| 2 | worker2 | 501 – 750 | 250 | 156375 |
-| 3 | worker3 | 751 – 1000 | 250 | 218875 |
-| **Combined** | | | **1000** | **500500** |
+| Rank | Node | Numbers received | Count | Local sum |
+|:---:|---|:---:|:---:|:---:|
+| 0 | master | 1 – 250 | 250 | 31,375 |
+| 1 | worker1 | 251 – 500 | 250 | 93,875 |
+| 2 | worker2 | 501 – 750 | 250 | 156,375 |
+| 3 | worker3 | 751 – 1000 | 250 | 218,875 |
+| **Total** | | | **1000** | **500,500** |
 
-(Local sums are calculated from the block each rank receives. 31375 + 93875 + 156375 + 218875 = 500500.)
+> 31375 + 93875 + 156375 + 218875 = **500500** ✅
 
-## 5. Environment / Cluster Setup
+---
 
-MPI runs many independent processes. Each process has its **own memory**, so data must be sent between processes explicitly. For this project, one Master VM and three Worker VMs are connected on the same virtual network.
+## 🖥️ Cluster Setup
 
-### 5.1 Requirements
-- VMware Workstation (or similar virtualization software)
-- Four Ubuntu virtual machines (1 Master + 3 Workers) on the same virtual network
-- OpenSSH Server and Open MPI installed on all nodes
+### Requirements
+
+- VMware Workstation (or similar)
+- Four Ubuntu VMs (1 Master + 3 Workers) on the same virtual network
+- OpenSSH Server and Open MPI on all nodes
 - Passwordless SSH from Master to all Workers
 
-### 5.2 Cluster Details
+### Cluster details
 
 | Node | Hostname | IP Address | MPI Rank |
-|------|----------|------------|----------|
+|---|---|---|:---:|
 | Master | master | 192.168.125.128 | 0 |
-| Worker1 | worker1 | 192.168.125.129 | 1 |
-| Worker2 | worker2 | 192.168.125.130 | 2 |
-| Worker3 | worker3 | 192.168.125.131 | 3 |
+| Worker 1 | worker1 | 192.168.125.129 | 1 |
+| Worker 2 | worker2 | 192.168.125.130 | 2 |
+| Worker 3 | worker3 | 192.168.125.131 | 3 |
 
 | Item | Details |
-|------|---------|
+|---|---|
 | OS | Ubuntu (VMware virtual machines) |
-| MPI Library | Open MPI (`openmpi-bin`, `libopenmpi-dev`) |
-| Compiler | `mpicc` (C language) |
+| MPI library | Open MPI (`openmpi-bin`, `libopenmpi-dev`) |
+| Compiler | `mpicc` (C) |
 | Processes | 4 (one per VM) |
 | Hostfile | `hosts` |
 
-### 5.3 Setup Steps
+<details>
+<summary><b>🔧 Click to expand: step-by-step setup</b></summary>
 
-**Step 1 – Set a unique hostname (run on each VM, only its own name)**
+**1. Set a unique hostname (on each VM, its own name only)**
 ```bash
-sudo hostnamectl set-hostname master     # worker1 / worker2 / worker3 on the other VMs
+sudo hostnamectl set-hostname master     # worker1 / worker2 / worker3 on the others
 ```
 
-**Step 2 – Find the IP address of each VM**
+**2. Find each VM's IP**
 ```bash
 hostname -I
 ```
 
-**Step 3 – Test network connectivity (on Master)**
+**3. Test connectivity (on Master)**
 ```bash
 ping -c 4 192.168.125.129
 ping -c 4 192.168.125.130
 ping -c 4 192.168.125.131
 ```
-Expected: 4 packets sent, 4 received, 0% packet loss.
+Expected: 4 packets sent, 4 received, 0% loss.
 
-**Step 4 – Install SSH on every VM**
+**4. Install SSH on every VM**
 ```bash
 sudo apt update
 sudo apt install openssh-server -y
 sudo systemctl enable --now ssh
 ```
 
-**Step 5 – Install Open MPI on every VM**
+**5. Install Open MPI on every VM**
 ```bash
-sudo apt update
 sudo apt install openmpi-bin libopenmpi-dev -y
 ```
 
-**Step 6 – Verify MPI on every VM**
+**6. Verify**
 ```bash
 mpicc --version
 mpirun --version
 ```
 
-**Step 7 – Create SSH key on Master**
+**7. Create an SSH key on Master**
 ```bash
 ssh-keygen -t rsa
 ```
 
-**Step 8 – Copy the key to the Workers (on Master)**
+**8. Copy the key to the Workers**
 ```bash
 ssh-copy-id worker1
 ssh-copy-id worker2
 ssh-copy-id worker3
 ```
 
-**Step 9 – Test passwordless SSH (on Master)**
+**9. Test passwordless SSH**
 ```bash
 ssh worker1 hostname
 ssh worker2 hostname
 ssh worker3 hostname
 ```
-Expected output: `worker1`, `worker2`, `worker3` without asking for a password.
+Expected: `worker1`, `worker2`, `worker3` with no password prompt.
 
-**Step 10 – Create the working directory and hostfile (on Master)**
+**10. Create the working directory and hostfile (on Master)**
 ```bash
 mkdir -p ~/parallel_lab/mpi
 cd ~/parallel_lab/mpi
 nano hosts
 ```
 Contents of `hosts`:
-```
+```text
 master slots=1
 worker1 slots=1
 worker2 slots=1
 worker3 slots=1
 ```
-The hostfile tells `mpirun` which machines take part in the run. `slots=1` means one process per machine.
+`slots=1` means one process per machine.
 
-## 6. Repository Structure
+</details>
 
+---
+
+## 📁 Repository Structure
+
+```text
+.
+├── README.md
+├── src/
+│   ├── dataset_stats_sequential.c       # Sequential version (N = 1000)
+│   └── dataset_stats_parallel_mpi.c     # MPI parallel version
+├── data/
+│   └── dataset.txt                      # Dataset (numbers 1..1000)
+├── results/
+│   └── output.txt                       # Program output
+├── graphs/
+│   ├── mpi_execution_time.png
+│   ├── work_per_process.png
+│   └── local_sum_per_rank.png
+├── report/                              # Report
+└── presentation/
+    └── Distributed_Dataset_Statistics_MPI.pptx
 ```
-lab-evaluation-parallel-computing/
-|-- README.md
-|-- src/
-|   |-- dataset_stats_sequential.c        # Sequential version (n = 1000)
-|   |-- dataset_stats_sequential_timed.c  # Same, with timing (optional)
-|   `-- dataset_stats_parallel_mpi.c      # MPI parallel version
-|-- data/                                 # Dataset (numbers 1..1000 generated in code)
-|-- results/                              # Output text and terminal screenshots
-|-- graphs/                               # Comparison graphs
-|-- report/                               # Optional PDF report
-`-- presentation/                         # The single PPT
-```
 
-## 7. How to Build and Run
+---
 
-All commands are run on the **Master VM** inside `~/parallel_lab/mpi`.
+## 🚀 Build & Run
 
-### 7.1 Compile
+All commands run on the **Master VM** inside `~/parallel_lab/mpi`.
+
+**1. Compile**
 ```bash
 mpicc -O2 src/dataset_stats_parallel_mpi.c -o dataset_stats
 ```
 
-### 7.2 Copy the executable to all Workers
-Every Worker runs the same program, so each one needs a copy.
+**2. Copy the executable to every Worker**
 ```bash
 scp dataset_stats worker1:~/dataset_stats
 scp dataset_stats worker2:~/dataset_stats
 scp dataset_stats worker3:~/dataset_stats
 ```
 
-### 7.3 Run on the cluster (4 processes)
+**3. Run on the cluster (4 processes)**
 ```bash
 mpirun -np 4 --hostfile hosts sh -c '$HOME/dataset_stats'
 ```
-This starts 4 MPI ranks: rank 0 on the Master and ranks 1, 2, 3 on Worker1, Worker2, Worker3.
 
-### 7.4 Sequential version (single process)
+**4. Sequential version**
 ```bash
 gcc src/dataset_stats_sequential.c -o dataset_stats_sequential
 ./dataset_stats_sequential
 ```
 
-### 7.5 Run MPI on a single machine (for testing)
+**5. Quick test on a single machine**
 ```bash
 mpirun -np 4 ./dataset_stats
 ```
 
-> If Open MPI refuses to run as root, run as a normal user. Do not disable the safety checks.
+> If Open MPI refuses to run as root, use a normal user. Do not disable the safety checks.
 
-## 8. Source Code
+<details>
+<summary><b>📄 Sequential source code</b></summary>
 
-### 8.1 Sequential (`src/dataset_stats_sequential.c`)
 ```c
 #include <stdio.h>
 int main() {
@@ -267,13 +336,16 @@ int main() {
 }
 ```
 
-### 8.2 Parallel MPI (`src/dataset_stats_parallel_mpi.c`)
-The MPI program follows the design in Section 4.2 (`MPI_Scatter`, local computation, three `MPI_Reduce` calls, `MPI_Wtime` for timing). See the source file in `src/`.
+The MPI program is in [`src/dataset_stats_parallel_mpi.c`](src/dataset_stats_parallel_mpi.c).
 
-## 9. Output
+</details>
 
-### 9.1 Sequential (run on WSL)
-```
+---
+
+## 🖨️ Output
+
+**Sequential**
+```text
 Sequential Dataset Statistics
 Dataset Size = 1000
 Sum = 500500
@@ -281,10 +353,9 @@ Average = 500.50
 Maximum = 1000
 Minimum = 1
 ```
-Screenshot: <img width="1600" height="906" alt="WhatsApp Image 2026-10-07 at 9 37 29 PM" src="https://github.com/user-attachments/assets/78c5baf0-62e0-4d71-840a-7344c67e1db9" />
 
-### 9.2 MPI – 4 processes on the Master + 3 Worker cluster
-```
+**MPI — 4 processes on Master + 3 Workers**
+```text
 ===== Distributed Dataset Statistics =====
 Dataset Size : 1000
 MPI Processes: 4
@@ -292,81 +363,106 @@ Sum          : 500500
 Average      : 500.50
 Maximum      : 1000
 Minimum      : 1
-Execution Time: 0.0003 seconds        (Run 2; Run 1 gave 0.0009 seconds)
+Execution Time: 0.0003 seconds
 ==========================================
 ```
-Screenshots: <img width="1496" height="1051" alt="WhatsApp Image 2026-10-07 at 9 40 19 PM" src="https://github.com/user-attachments/assets/597dd400-a38b-46b2-92d1-017e7a85d195" />
 
-## 10. Results and Comparison
+---
 
-### 10.1 Correctness
-| Quantity | Formula / Expected | Sequential | MPI (4 processes) |
-|----------|--------------------|------------|-------------------|
-| Sum | 1000 x 1001 / 2 | 500500 | 500500 |
-| Average | 500500 / 1000 | 500.50 | 500.50 |
-| Maximum | N | 1000 | 1000 |
-| Minimum | 1 | 1 | 1 |
+## 📊 Results & Graphs
 
-The parallel output is **identical** to the sequential output and to the formula, so the MPI program is **correct**.
+### ✅ Correctness
 
-### 10.2 MPI Execution Time (N = 1000, 4 processes)
+| Quantity | Formula / Expected | Sequential | MPI (4 processes) | Match |
+|---|---|:---:|:---:|:---:|
+| Sum | 1000 × 1001 / 2 | 500500 | 500500 | ✅ |
+| Average | 500500 / 1000 | 500.50 | 500.50 | ✅ |
+| Maximum | N | 1000 | 1000 | ✅ |
+| Minimum | 1 | 1 | 1 | ✅ |
 
-| Run | Execution Time |
-|-----|----------------|
+The parallel output is **identical** to the sequential output and to the formula.
+
+### ⏱️ MPI execution time
+
+| Run | Time |
+|:---:|:---:|
 | Run 1 | 0.0009 s (0.9 ms) |
 | Run 2 | 0.0003 s (0.3 ms) |
 
-![MPI execution time](<img width="1200" height="800" alt="image" src="https://github.com/user-attachments/assets/c3b5ceaa-3aa2-48cd-90a7-e38c17fba69c" />
+![MPI execution time](graphs/mpi_execution_time.png)
 
-)
+### ⚖️ Workload comparison
 
-### 10.3 Workload Comparison
-
-| Version | Processes | Numbers handled by each process |
-|---------|-----------|---------------------------------|
+| Version | Processes | Numbers per process |
+|---|:---:|:---:|
 | Sequential | 1 | 1000 |
-| MPI parallel | 4 | 250 |
+| MPI parallel | 4 | **250** |
 
-Each MPI process does **4 times less work** than the sequential process.
+Each MPI process does **4× less work** than the sequential process.
 
-![Work per process] ( <img width="1300" height="800" alt="image" src="https://github.com/user-attachments/assets/79c6a465-2c2a-43f4-b3ec-19517c1b8e6b" />)
+![Work per process](graphs/work_per_process.png)
 
-### 10.4 Speedup and Efficiency
-Speedup = T(sequential) / T(parallel) and Efficiency = Speedup / 4.
-The sequential program in the lab did not print its execution time, and it was run on a different system (Windows WSL) from the MPI cluster (Ubuntu VMs). So a fair speedup value is **not calculated here**. To obtain it, run `src/dataset_stats_sequential_timed.c` on the Master VM and put the time in this table:
+### 🧮 Local sum per rank
+
+![Local sum per rank](graphs/local_sum_per_rank.png)
+
+### 🚀 Speedup & efficiency
+
+Speedup = T(sequential) / T(parallel), and Efficiency = Speedup / 4.
+
+The sequential program did not print its execution time and was run on a different system (Windows WSL) from the MPI cluster (Ubuntu VMs), so a fair speedup value is **not calculated here**. To get one, time the sequential program on the Master VM and fill in:
 
 | T(sequential) | T(parallel, 4 processes) | Speedup | Efficiency |
-|---------------|--------------------------|---------|------------|
-| [measure on master VM] | 0.0003 s (best run) | [ ] | [ ] |
+|:---:|:---:|:---:|:---:|
+| *measure on master VM* | 0.0003 s (best run) | — | — |
 
-## 11. Analysis and Discussion
+---
 
-- The 1000 numbers are split equally, so every process has the **same workload** (250 numbers) and the load is balanced.
-- Each process works only on its own memory. Data is moved only by `MPI_Scatter` and `MPI_Reduce`, and only three small values (sum, max, min) are sent back by each process.
-- The MPI time changed between runs (0.9 ms and 0.3 ms). This shows that the time at this size is mostly **communication and network overhead** between the VMs, which varies from run to run.
-- For N = 1000 the actual calculation takes only a few microseconds, so the communication time is larger than the computation time. Therefore a big speedup is **not expected** at this size. Parallel processing becomes useful for **much larger datasets**, where computing time dominates.
+## 🔍 Analysis
+
+- The 1000 numbers are split equally, so every process has the **same workload** (250) — the load is **balanced**.
+- Each process uses only its own memory. Data moves only through `MPI_Scatter` and `MPI_Reduce`, and each process sends back just three small values (sum, max, min).
+- The MPI time changed between runs (0.9 ms vs 0.3 ms), showing that at this size the time is mostly **communication and network overhead** between VMs.
+- For N = 1000 the calculation itself takes only microseconds, so communication costs more than computation. A large speedup is **not expected** here; parallelism pays off on **much larger datasets**.
 - `MPI_Reduce` is efficient because rank 0 combines only a few partial answers instead of receiving every number.
 
+---
 
+## 🛠️ Troubleshooting
 
-## 12. Known Messages / Troubleshooting
+| Problem | Explanation / Fix |
+|---|---|
+| `Authorization required, but no authorization protocol specified` (many times) | A display (X11 / GUI) warning from the VM. It does **not** affect the MPI computation; the final output is still correct. |
+| `mpirun` cannot reach workers | Check passwordless SSH and the names in `hosts`. |
+| Executable not found on a worker | Copy it again with `scp`. |
+| Open MPI refuses to run as root | Run as a normal user. |
 
-- **"Authorization required, but no authorization protocol specified"** appears many times in the terminal during the run. It is a display (X11 / GUI) authorization warning from the VM and does **not** affect the MPI computation. The final output is correct.
-- The program prints `Executon Time` in the screenshot (spelling mistake in the print statement). Correct it to `Execution Time` in the source before final submission.
-- If `mpirun` cannot reach workers, check passwordless SSH and the names in `hosts`.
-- If the executable is not found on a worker, copy it again using `scp`.
+---
 
-## 13. Checkpoint Mapping
+## 🗺️ Checkpoint Mapping
 
-| Checkpoint | Work | Where in this repo |
-|-----------|------|--------------------|
-| 1 | Problem definition, sequential algorithm, parallel design | Sections 3 and 4 |
-| 2 | Working parallel implementation (MPI) | `src/`, Sections 5, 7, 8 |
-| 3 | Run and collect results | Sections 9 and 10, `results/` |
-| 4 | Graphs and analysis | `graphs/`, Sections 10 and 11 |
+| Checkpoint | Work | Where |
+|:---:|---|---|
+| 1 | Problem definition, sequential algorithm, parallel design | Problem Definition, Algorithms |
+| 2 | Working parallel implementation (MPI) | `src/`, Cluster Setup, Build & Run |
+| 3 | Run and collect results | Output, Results, `results/` |
+| 4 | Graphs and analysis | `graphs/`, Results & Graphs, Analysis |
 | 5 | Final demonstration and viva | `presentation/` |
 
-## 14. Conclusion
+---
 
-The program computes the sum, average, maximum and minimum of 1000 numbers using 4 MPI processes on one Master and three Worker VMs. The data was divided with `MPI_Scatter` (250 numbers per process) and combined with `MPI_Reduce`. The result (Sum = 500500, Average = 500.50, Max = 1000, Min = 1) matches the sequential program and the formula. Each process does four times less work than the sequential version. At this small size, communication overhead dominates the execution time (0.3 ms to 0.9 ms), so larger datasets are needed to show real speedup.
+## ✅ Conclusion
 
+The program computes the sum, average, maximum and minimum of 1000 numbers using **4 MPI processes** on one Master and three Worker VMs. Data was divided with `MPI_Scatter` (250 numbers per process) and combined with `MPI_Reduce`.
+
+The result — **Sum = 500500, Average = 500.50, Max = 1000, Min = 1** — matches the sequential program and the formula. Each process does four times less work than the sequential version. At this small size, communication overhead dominates execution time (0.3 – 0.9 ms), so larger datasets are needed to show real speedup.
+
+---
+
+<div align="center">
+
+Made with ☕ and MPI by **Team B1-6** · [chaitanya-m5](https://github.com/chaitanya-m5)
+
+⭐ If you found this helpful, consider starring the repo!
+
+</div>
