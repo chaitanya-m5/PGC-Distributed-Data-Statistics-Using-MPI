@@ -33,8 +33,8 @@
 
 | Name | Roll No. |
 |---|:---:|
-| Divya Kumari | 222 |
-| Chaitanya M | 228 |
+| Chaitanya M | 226 |
+| Divya | 226 |
 | Shridevi | 230 |
 | Vineet K | 221 |
 
