@@ -1,15 +1,8 @@
 <div align="center">
 
-# 🌐 Distributed Dataset Statistics using MPI
+# Distributed Dataset Statistics using MPI
 
 ### Sum · Average · Maximum · Minimum — computed in parallel across a Master + 3 Worker cluster
-
-![C](https://img.shields.io/badge/Language-C-00599C?style=for-the-badge&logo=c&logoColor=white)
-![MPI](https://img.shields.io/badge/Model-MPI-blueviolet?style=for-the-badge)
-![Open MPI](https://img.shields.io/badge/Library-Open%20MPI-orange?style=for-the-badge)
-![Ubuntu](https://img.shields.io/badge/OS-Ubuntu%20VMs-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
-![Processes](https://img.shields.io/badge/Processes-4-success?style=for-the-badge)
-![Status](https://img.shields.io/badge/Result-Verified%20✔-brightgreen?style=for-the-badge)
 
 **Parallel and Grid Computing (PGC) — Lab Evaluation · Theme 6 · Team B1-6**
 
@@ -17,19 +10,19 @@
 
 ---
 
-## ✨ At a Glance
+##  At a Glance
 
 | | |
 |---|---|
-| 🎓 **Course** | Parallel and Grid Computing (PGC) – Lab Evaluation |
-| 🧩 **Theme** | 6 – Distributed Dataset Statistics |
-| ⚙️ **Parallel model** | MPI (Message Passing Interface) |
-| 📦 **Dataset** | N = 1000 integers (1 … 1000) |
-| 🖥️ **Cluster** | 1 Master + 3 Worker VMs → **4 MPI processes** |
-| 🎯 **Result** | Sum = **500500**, Average = **500.50**, Max = **1000**, Min = **1** |
-| ⏱️ **MPI time** | **0.3 – 0.9 ms** |
+| **Course** | Parallel and Grid Computing (PGC) – Lab Evaluation |
+| **Theme** | 6 – Distributed Dataset Statistics |
+| **Parallel model** | MPI (Message Passing Interface) |
+| **Dataset** | N = 1000 integers (1 … 1000) |
+| **Cluster** | 1 Master + 3 Worker VMs → **4 MPI processes** |
+| **Result** | Sum = **500500**, Average = **500.50**, Max = **1000**, Min = **1** |
+| **MPI time** | **0.3 – 0.9 ms** |
 
-### 👥 Team
+### Team
 
 | Name | Roll No. |
 |---|:---:|
@@ -40,7 +33,7 @@
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
 1. [Objective](#-objective)
 2. [How It Works](#-how-it-works)
@@ -58,13 +51,13 @@
 
 ---
 
-## 🎯 Objective
+## Objective
 
 Calculate the **sum, average, maximum and minimum** of a dataset of **1000 numbers** using **4 MPI processes** on one Master and three Worker VMs, and compare the parallel result and workload with the sequential version.
 
 ---
 
-## 💡 How It Works
+## How It Works
 
 When a dataset is large, one computer takes a long time to process it. The idea:
 
@@ -77,7 +70,7 @@ When a dataset is large, one computer takes a long time to process it. The idea:
 
 ---
 
-## 📋 Problem Definition
+##  Problem Definition
 
 - **Input:** N = 1000 integers `1, 2, 3, …, 1000`
 - **Output:** Sum, Average (= Sum / N), Maximum, Minimum
@@ -87,7 +80,7 @@ Expected values from the formula: Sum = 1000 × 1001 / 2 = **500500**, Average =
 
 ---
 
-## 🧠 Algorithms
+##  Algorithms
 
 ### Sequential
 
@@ -146,11 +139,11 @@ flowchart TD
 | 3 | worker3 | 751 – 1000 | 250 | 218,875 |
 | **Total** | | | **1000** | **500,500** |
 
-> 31375 + 93875 + 156375 + 218875 = **500500** ✅
+> 31375 + 93875 + 156375 + 218875 = **500500** 
 
 ---
 
-## 🖥️ Cluster Setup
+## Cluster Setup
 
 ### Requirements
 
@@ -254,7 +247,7 @@ worker3 slots=1
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 .
@@ -277,7 +270,7 @@ worker3 slots=1
 
 ---
 
-## 🚀 Build & Run
+## Build & Run
 
 All commands run on the **Master VM** inside `~/parallel_lab/mpi`.
 
@@ -342,7 +335,7 @@ The MPI program is in [`src/dataset_stats_parallel_mpi.c`](src/dataset_stats_par
 
 ---
 
-## 🖨️ Output
+## Output
 
 **Sequential**
 ```text
@@ -369,20 +362,20 @@ Execution Time: 0.0003 seconds
 
 ---
 
-## 📊 Results & Graphs
+## Results & Graphs
 
-### ✅ Correctness
+### Correctness
 
 | Quantity | Formula / Expected | Sequential | MPI (4 processes) | Match |
 |---|---|:---:|:---:|:---:|
-| Sum | 1000 × 1001 / 2 | 500500 | 500500 | ✅ |
-| Average | 500500 / 1000 | 500.50 | 500.50 | ✅ |
-| Maximum | N | 1000 | 1000 | ✅ |
-| Minimum | 1 | 1 | 1 | ✅ |
+| Sum | 1000 × 1001 / 2 | 500500 | 500500 | 
+| Average | 500500 / 1000 | 500.50 | 500.50 | 
+| Maximum | N | 1000 | 1000 | 
+| Minimum | 1 | 1 | 1 | 
 
 The parallel output is **identical** to the sequential output and to the formula.
 
-### ⏱️ MPI execution time
+###  MPI execution time
 
 | Run | Time |
 |:---:|:---:|
@@ -391,7 +384,7 @@ The parallel output is **identical** to the sequential output and to the formula
 
 ![MPI execution time](graphs/mpi_execution_time.png)
 
-### ⚖️ Workload comparison
+###  Workload comparison
 
 | Version | Processes | Numbers per process |
 |---|:---:|:---:|
@@ -402,11 +395,11 @@ Each MPI process does **4× less work** than the sequential process.
 
 ![Work per process](graphs/work_per_process.png)
 
-### 🧮 Local sum per rank
+### Local sum per rank
 
 ![Local sum per rank](graphs/local_sum_per_rank.png)
 
-### 🚀 Speedup & efficiency
+###  Speedup & efficiency
 
 Speedup = T(sequential) / T(parallel), and Efficiency = Speedup / 4.
 
@@ -418,7 +411,7 @@ The sequential program did not print its execution time and was run on a differe
 
 ---
 
-## 🔍 Analysis
+##  Analysis
 
 - The 1000 numbers are split equally, so every process has the **same workload** (250) — the load is **balanced**.
 - Each process uses only its own memory. Data moves only through `MPI_Scatter` and `MPI_Reduce`, and each process sends back just three small values (sum, max, min).
@@ -428,7 +421,7 @@ The sequential program did not print its execution time and was run on a differe
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 | Problem | Explanation / Fix |
 |---|---|
@@ -439,7 +432,7 @@ The sequential program did not print its execution time and was run on a differe
 
 ---
 
-## 🗺️ Checkpoint Mapping
+## Checkpoint Mapping
 
 | Checkpoint | Work | Where |
 |:---:|---|---|
@@ -451,7 +444,7 @@ The sequential program did not print its execution time and was run on a differe
 
 ---
 
-## ✅ Conclusion
+##  Conclusion
 
 The program computes the sum, average, maximum and minimum of 1000 numbers using **4 MPI processes** on one Master and three Worker VMs. Data was divided with `MPI_Scatter` (250 numbers per process) and combined with `MPI_Reduce`.
 
@@ -461,8 +454,6 @@ The result — **Sum = 500500, Average = 500.50, Max = 1000, Min = 1** — match
 
 <div align="center">
 
-Made with ☕ and MPI by **Team B1-6** · [chaitanya-m5](https://github.com/chaitanya-m5)
-
-⭐ If you found this helpful, consider starring the repo!
+If you found this helpful, consider starring the repo!
 
 </div>
